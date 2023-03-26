@@ -40,5 +40,5 @@ home.rst
 make.bat
 
 doc-dev
-db.sqlite3
+foodmap.db
 Footer
