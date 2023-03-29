@@ -1,4 +1,4 @@
-from .menu import dp
-from .users import dp
+from .profile import dp
+from .commands import dp
 
 __all__ = ["dp"]

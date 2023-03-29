@@ -6,7 +6,7 @@ def create_db():
 
     # Create User table
     connection.execute('''
-    CREATE TABLE users (
+    CREATE TABLE commands (
         id INTEGER PRIMARY KEY,
         name TEXT,
         gender TEXT,
@@ -14,7 +14,10 @@ def create_db():
         weight REAL,
         height REAL,
         active TEXT,
-        target TEXT
+        target TEXT,
+        daily_bzhu TEXT DEFAULT "30/30/40",
+        daily_calories INTEGER,
+        daily_water_allowance INTEGER
     )
     ''')
 
@@ -28,7 +31,7 @@ def create_db():
         carbohydrates REAL,
         calories INTEGER,
         user_id INTEGER,
-        FOREIGN KEY (user_id) REFERENCES users (id)
+        FOREIGN KEY (user_id) REFERENCES commands (id)
     )
     ''')
 
@@ -42,7 +45,7 @@ def create_db():
         product_quantity INTEGER,
         user_id INTEGER,
         FOREIGN KEY (product_id) REFERENCES products (id),
-        FOREIGN KEY (user_id) REFERENCES users (id)
+        FOREIGN KEY (user_id) REFERENCES commands (id)
     )
     ''')
 
@@ -54,10 +57,10 @@ def insert():
     conn = sqlite3.connect('foodmap.db')
     cursor = conn.cursor()
 
-    cursor.execute("INSERT INTO users (id, name, gender, age, weight, height, active, target) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+    cursor.execute("INSERT INTO commands (id, name, gender, age, weight, height, active, target) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
                    ('12356', 'John doe', 'male', 30, 80.3, 1.8, 'moderate', 'lose_weight'))
 
-    users = cursor.execute("SELECT * FROM users")
+    users = cursor.execute("SELECT * FROM commands")
     print(users.fetchall())
 
     conn.commit()
@@ -76,5 +79,6 @@ def insert1():
 
     conn.commit()
     conn.close()
+
 
 

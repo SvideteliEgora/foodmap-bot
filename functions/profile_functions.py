@@ -14,7 +14,7 @@ def verify_number(number: str) -> bool:
 
 
 # bzhu
-def get_calculate_bzhu(weight: float, height: float, age: int, active: str, gender: str, target: str,
+def calculate_bzhu(weight: float, height: float, age: int, active: str, gender: str, target: str,
                        proteins_percentage=30, fats_percentage=30, carbohydrates_percentage=40) -> int and str:
     activity_coefficient = None
     activity_coefficients_dict = {
@@ -51,5 +51,6 @@ def get_calculate_bzhu(weight: float, height: float, age: int, active: str, gend
     carbohydrates = round(((calories * carbohydrates_percentage) // 100) / 4)
 
     bzhu = '{}/{}/{}'.format(proteins, fats, carbohydrates)
+    water = round(weight * 30)
 
-    return calories, bzhu
+    return calories, bzhu, water

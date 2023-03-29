@@ -3,7 +3,7 @@ from aiogram.contrib.fsm_storage.memory import MemoryStorage
 import config
 import asyncio
 
-from db import UsersDB, FeedingDB, ProductsDB
+from db import UsersDB, FeedingDB, ProductsDB, BotProductsDB
 
 
 
@@ -14,4 +14,5 @@ dp = Dispatcher(bot, loop, storage)
 UsersDB = UsersDB('foodmap.db')
 FeedingDB = FeedingDB('foodmap.db')
 ProductsDB = ProductsDB('foodmap.db')
+BotProductsDB = BotProductsDB('foodmap.db')
 
