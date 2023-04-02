@@ -1,8 +1,8 @@
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Command, Text
-from functions.profile_functions import calculate_bzhu, verify_number
-from loader import bot, dp, UsersDB
+from functions.profile_functions import calculate_daily_calories, verify_number
+from loader import bot, dp, UserProfilesDB
 from murkups.profile_markups import target_ikb, active_ikb, gender_ikb, params_edit_profile_ikb, edit_profile_ikb
 from states import EditProfileStatesGroup
 
@@ -56,16 +56,6 @@ async def edit_one_param_profile_cb(callback: types.CallbackQuery):
         await callback.message.answer(text='Введите значение для БЖУ через пробел. (например: 30 30 40)')
 
 
-@dp.message_handler(Command('cancel'), state='*')
-async def cmd_cancel(message: types.Message, state: FSMContext) -> None:
-    if state is None:
-        return
-
-    await state.finish()
-    await bot.send_message(chat_id=message.from_user.id,
-                           text='Операция прервана')
-
-
 # check new name
 @dp.message_handler(lambda message: not (message.text.isalpha() or len(message.text) >= 15),
                     state=EditProfileStatesGroup.name)
@@ -80,7 +70,7 @@ async def check_new_name(message: types.Message) -> None:
 @dp.message_handler(state=EditProfileStatesGroup.name)
 async def update_name(message: types.Message, state: FSMContext) -> None:
     await state.finish()
-    UsersDB.update_one_user_param(user_id=message.from_user.id, column='name', value=message.text.title())
+    UserProfilesDB.update_one_user_param(user_id=message.from_user.id, column='name', value=message.text.title())
     await bot.send_message(chat_id=message.from_user.id,
                            text="Имя успешно изменено!")
     await message.delete()
@@ -101,7 +91,7 @@ async def check_new_age(message: types.Message) -> None:
 @dp.message_handler(state=EditProfileStatesGroup.age)
 async def update_age(message: types.Message, state: FSMContext) -> None:
     await state.finish()
-    UsersDB.update_one_user_param(user_id=message.from_user.id, column='age', value=message.text.title())
+    UserProfilesDB.update_one_user_param(user_id=message.from_user.id, column='age', value=message.text.title())
     await bot.send_message(chat_id=message.from_user.id,
                            text='Возраст успешно изменен!')
     await message.delete()
@@ -127,7 +117,7 @@ async def update_weight(message: types.Message, state: FSMContext) -> None:
         value = round(float(message.text))
 
     await state.finish()
-    UsersDB.update_one_user_param(user_id=message.from_user.id, column='weight', value=value)
+    UserProfilesDB.update_one_user_param(user_id=message.from_user.id, column='weight', value=value)
     await bot.send_message(chat_id=message.from_user.id,
                            text='Вес успешно изменен!')
     await message.delete()
@@ -152,7 +142,7 @@ async def update_height(message: types.Message, state: FSMContext) -> None:
         value = round(float(message.text))
 
     await state.finish()
-    UsersDB.update_one_user_param(user_id=message.from_user.id, column='height', value=value)
+    UserProfilesDB.update_one_user_param(user_id=message.from_user.id, column='height', value=value)
     await bot.send_message(chat_id=message.from_user.id,
                            text="Рост успешно изменен")
     await message.delete()
@@ -168,7 +158,7 @@ async def check_new_gender(message: types.Message) -> None:
 @dp.callback_query_handler(state=EditProfileStatesGroup.gender)
 async def update_gender(callback: types.CallbackQuery, state: FSMContext) -> None:
     await state.finish()
-    UsersDB.update_one_user_param(user_id=callback.from_user.id, column='gender', value=callback.data)
+    UserProfilesDB.update_one_user_param(user_id=callback.from_user.id, column='gender', value=callback.data)
     await callback.message.edit_text(text="Пол успешно изменен!")
 
 
@@ -182,7 +172,7 @@ async def check_new_target(message: types.Message) -> None:
 @dp.callback_query_handler(state=EditProfileStatesGroup.target)
 async def update_target(callback: types.CallbackQuery, state: FSMContext) -> None:
     await state.finish()
-    UsersDB.update_one_user_param(user_id=callback.from_user.id, column='target', value=callback.data)
+    UserProfilesDB.update_one_user_param(user_id=callback.from_user.id, column='target', value=callback.data)
     await callback.message.edit_text(text="Цель успешно изменена!")
 
 
@@ -204,7 +194,7 @@ async def update_active(callback: types.CallbackQuery, state: FSMContext) -> Non
     }
 
     await state.finish()
-    UsersDB.update_one_user_param(user_id=callback.from_user.id, column='active', value=activity_levels[callback.data])
+    UserProfilesDB.update_one_user_param(user_id=callback.from_user.id, column='active', value=activity_levels[callback.data])
     await callback.message.edit_text(text='Ваша активность успешно изменена!')
 
 

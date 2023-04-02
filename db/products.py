@@ -1,10 +1,10 @@
 from .database import DB
 
 
-class BotProductsDB(DB):
+class ProductsDB(DB):
     def find_products(self, product_name):
         """Находим все пересечения с product_name"""
-        query = "SELECT * FROM bot_products WHERE title LIKE ?"
+        query = "SELECT * FROM products WHERE title LIKE ?"
         result_query_title = self.cursor.execute(query, ('%' + product_name.title() + '%',)).fetchall()
         result_query_lower = self.cursor.execute(query, ('%' + product_name.lower() + '%',)).fetchall()
         full_result = result_query_lower + result_query_title
@@ -19,4 +19,19 @@ class BotProductsDB(DB):
                 'carbohydrates': item[5]
             })
         return result_json
+
+    def get_product(self, product_id):
+        """Находим продукт по product_id"""
+        search_result = self.cursor.execute("SELECT * from products WHERE id = ?", (product_id,))
+        result = search_result.fetchone()
+        data = {
+            'id': result[0],
+            'title': result[1],
+            'calories': result[2],
+            'proteins': result[3],
+            'fats': result[4],
+            'carbohydrates': result[5]
+        }
+
+        return data
 

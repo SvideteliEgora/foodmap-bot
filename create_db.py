@@ -6,7 +6,7 @@ def create_db():
 
     # Create User table
     connection.execute('''
-    CREATE TABLE commands (
+    CREATE TABLE user_profiles (
         id INTEGER PRIMARY KEY,
         name TEXT,
         gender TEXT,
@@ -23,7 +23,7 @@ def create_db():
 
     # Create Product table
     connection.execute('''
-    CREATE TABLE products (
+    CREATE TABLE user_products (
         id INTEGER PRIMARY KEY,
         title TEXT,
         proteins REAL,
@@ -31,21 +31,21 @@ def create_db():
         carbohydrates REAL,
         calories INTEGER,
         user_id INTEGER,
-        FOREIGN KEY (user_id) REFERENCES commands (id)
+        FOREIGN KEY (user_id) REFERENCES users (id)
     )
     ''')
 
     # Create Feeding table
     connection.execute('''
-    CREATE TABLE feeding (
+    CREATE TABLE user_feeding (
         id INTEGER PRIMARY KEY,
         feeding_date TIMESTAMP DEFAULT (DATE(CURRENT_TIMESTAMP)),
         feeding_time TIME DEFAULT (strftime('%H:%M:%S', 'now', 'localtime')),
         product_id INTEGER,
         product_quantity INTEGER,
         user_id INTEGER,
-        FOREIGN KEY (product_id) REFERENCES products (id),
-        FOREIGN KEY (user_id) REFERENCES commands (id)
+        FOREIGN KEY (product_id) REFERENCES search_products (id),
+        FOREIGN KEY (user_id) REFERENCES users (id)
     )
     ''')
 
@@ -53,32 +53,22 @@ def create_db():
     connection.close()
 
 
-def insert():
+def update_column():
+
+    # создаем соединение с базой данных
     conn = sqlite3.connect('foodmap.db')
-    cursor = conn.cursor()
+    c = conn.cursor()
 
-    cursor.execute("INSERT INTO commands (id, name, gender, age, weight, height, active, target) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-                   ('12356', 'John doe', 'male', 30, 80.3, 1.8, 'moderate', 'lose_weight'))
-
-    users = cursor.execute("SELECT * FROM commands")
-    print(users.fetchall())
+    # изменяем название столбца
+    c.execute("ALTER TABLE user_feeding RENAME COLUMN product_quantity TO product_weight")
 
     conn.commit()
     conn.close()
 
 
-def insert1():
+def add_column():
     conn = sqlite3.connect('foodmap.db')
     cursor = conn.cursor()
-
-    cursor.execute("INSERT INTO feeding (product_id, product_quantity, user_id) VALUES (?, ?, ?)",
-                   (1, 100, 123))
-
-    f = cursor.execute("SELECT * FROM feeding")
-    print(f.fetchall())
-
+    cursor.execute("ALTER TABLE user_profiles ADD COLUMN daily_pfc TEXT")
     conn.commit()
     conn.close()
-
-
-

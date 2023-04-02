@@ -1,19 +1,18 @@
-from aiogram.dispatcher.filters import Command
-from loader import dp, bot, UsersDB
+from loader import dp, bot, UserProfilesDB
 from aiogram import types
-from states.profile_states import CreateProfileStatesGroup
-from murkups.profile_markups import edit_profile_ikb
+from murkups.profile_markups import CREATE_PROFILE, edit_profile_ikb
 
 
-@dp.message_handler(Command('profile'))
+@dp.message_handler(commands=['profile'])
 async def cmd_profile(message: types.Message) -> None:
-    if(not UsersDB.user_exists(user_id=message.from_user.id)):
+    if not UserProfilesDB.user_exists(user_id=message.from_user.id):
         await bot.send_message(chat_id=message.from_user.id,
-                               text='У тебя пока нет прфиля. Давай создадим его.\n'
-                                    'Напиши, как тебя зовут: (например: Вадим)')
-        await CreateProfileStatesGroup.name.set()
+                               text='У тебя еще нет профиля, предлагаю создать его.',
+                               reply_markup=CREATE_PROFILE)
+
     else:
-        user_profile = UsersDB.get_user_profile(message.from_user.id)
+
+        user_profile = UserProfilesDB.get_user_profile(message.from_user.id)
 
         await bot.send_message(chat_id=message.from_user.id,
                                text=f"<em>Имя</em>: <b>{user_profile['name']}</b>\n"
@@ -25,7 +24,6 @@ async def cmd_profile(message: types.Message) -> None:
                                     f"<em>Цель</em>: <b>{user_profile['target']}</b>\n\n"
                                     f"<em>Ежедневная норма </em>: <b>{user_profile['daily_calories']} ккал</b>\n"
                                     f"<em>Ежедневный объем воды</em>: <b>{user_profile['daily_water_allowance']} мл</b>\n"
-                                    f"<em>Соотношение БЖУ</em>: <b>{user_profile['daily_bzhu']}</b>",
+                                    f"<em>Соотношение БЖУ</em>: <b>{user_profile['pfc_ratio']}</b>",
                                parse_mode='HTML',
                                reply_markup=edit_profile_ikb)
-    await message.delete()

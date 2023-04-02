@@ -1,4 +1,9 @@
-from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardButton, InlineKeyboardMarkup
+from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+
+
+CREATE_PROFILE = InlineKeyboardMarkup(inline_keyboard=[
+    [InlineKeyboardButton('Создать', callback_data="create_profile")]
+])
 
 
 target_ikb = InlineKeyboardMarkup(inline_keyboard=[

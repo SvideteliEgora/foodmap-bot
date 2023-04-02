@@ -1,11 +1,17 @@
 from aiogram import types
 from aiogram.dispatcher import FSMContext
-from aiogram.dispatcher.filters import Command
-from functions.profile_functions import calculate_bzhu, verify_number
-from loader import bot, dp, UsersDB
+from aiogram.dispatcher.filters import Text
+from functions.profile_functions import calculate_daily_calories, verify_number, calculate_daily_pfc, calculate_daily_water_allowance
+from loader import bot, dp, UserProfilesDB
 from murkups.profile_markups import target_ikb, active_ikb, gender_ikb
 from states import CreateProfileStatesGroup
-from aiogram.types import ReplyKeyboardRemove
+
+
+@dp.callback_query_handler(Text(equals='create_profile'))
+async def started_create_profile(callback: types.Message) -> None:
+    await CreateProfileStatesGroup.name.set()
+    await callback.bot.send_message(chat_id=callback.from_user.id,
+                                    text='Твое имя:')
 
 
 # check name
@@ -16,16 +22,6 @@ async def check_name(message: types.Message) -> None:
                            text='<em>Некоректные данные</em>\n'
                                 'Имя может содержать только букенные символы, в колличестве не больше 15.')
     await message.delete()
-
-
-@dp.message_handler(Command('cancel'), state=CreateProfileStatesGroup.all_states)
-async def cmd_cancel(message: types.Message, state: FSMContext) -> None:
-    if state is None:
-        return
-
-    await state.finish()
-    await bot.send_message(chat_id=message.from_user.id,
-                           text='Операция прервана')
 
 
 # load name, next age
@@ -172,14 +168,18 @@ async def load_active(callback: types.CallbackQuery, state: FSMContext) -> None:
     async with state.proxy() as data:
         data['active'] = activity_levels[callback.data]
 
-        daily_calories, daily_bzhu, daily_water_allowance = calculate_bzhu(weight=data['weight'], height=data['height'],
-                                                                           age=data['age'], active=data['active'],
-                                                                           gender=data['gender'], target=data['target'])
+        daily_calories = calculate_daily_calories(weight=data['weight'], height=data['height'],
+                                                  age=data['age'], active=data['active'],
+                                                  gender=data['gender'], target=data['target'])
+
+        daily_water_allowance = calculate_daily_water_allowance(weight=data['weight'])
+        daily_pfc = calculate_daily_pfc(daily_calories, {'proteins': 30, 'fats': 30, 'carbohydrates': 40})
+
+        data['daily_pfc'] = daily_pfc['daily_pfc_string']
         data['daily_calories'] = daily_calories
-        data['daily_bzhu'] = daily_bzhu
         data['daily_water_allowance'] = daily_water_allowance
 
-    UsersDB.add_user(user_id=callback.from_user.id, data=data)
+    UserProfilesDB.add_user(user_id=callback.from_user.id, data=data)
     await state.finish()
     await callback.message.edit_text(text='Данные профиля сохранены!\n\n'
                                           'Теперь вы можете добавлять продукты и следить за своим питанием!\n'

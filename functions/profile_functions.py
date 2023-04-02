@@ -13,9 +13,7 @@ def verify_number(number: str) -> bool:
     return True
 
 
-# bzhu
-def calculate_bzhu(weight: float, height: float, age: int, active: str, gender: str, target: str,
-                       proteins_percentage=30, fats_percentage=30, carbohydrates_percentage=40) -> int and str:
+def calculate_daily_calories(weight: float, height: float, age: int, active: str, gender: str, target: str) -> int:
     activity_coefficient = None
     activity_coefficients_dict = {
         'Никаких физических нагрузок': 1.2,
@@ -34,23 +32,38 @@ def calculate_bzhu(weight: float, height: float, age: int, active: str, gender: 
         calories = round((655.1 + (9.563 * weight) + (1.85 * height) - (4.676 * age)) * activity_coefficient)
         if target == 'Cнизить вес':
             calories = calories - (calories * 12) // 100
-
         elif target == 'Набрать вес':
             calories = calories + (calories * 12) // 100
     else:
-        calories = round((66.5 + (13.75 * weight) + (5.003 + height) - (6.775 * age)) * activity_coefficient)
+        calories = round((66.5 + (13.75 * weight) + (5.003 * height) - (6.775 * age)) * activity_coefficient)
         if target == 'Cнизить вес':
             calories = calories - (calories * 15) // 100
 
         elif target == 'Набрать вес':
             calories = calories + (calories * 15) // 100
 
-    # рассчитываем Б/Ж/У 30/30/40
-    proteins = round(((calories * proteins_percentage) // 100) / 4)
-    fats = round(((calories * fats_percentage) // 100) / 9)
-    carbohydrates = round(((calories * carbohydrates_percentage) // 100) / 4)
+    return calories
 
-    bzhu = '{}/{}/{}'.format(proteins, fats, carbohydrates)
-    water = round(weight * 30)
 
-    return calories, bzhu, water
+def calculate_daily_pfc(calories: float, pfc_ratio: dict) -> dict:
+
+    daily_pfc_dict = {
+        'proteins': round(((calories * pfc_ratio.get('proteins')) // 100) / 4),
+        'fats': round(((calories * pfc_ratio.get('fats')) // 100) / 9),
+        'carbohydrates': round(((calories * pfc_ratio.get('carbohydrates')) // 100) / 4)
+    }
+
+    daily_pfc_string = '{}/{}/{}'.format(daily_pfc_dict.get('proteins'), daily_pfc_dict.get('fats'), daily_pfc_dict.get('carbohydrates'))
+
+    pfc_full_stack = {
+        'daily_pfc_dict': daily_pfc_dict,
+        'daily_pfc_string': daily_pfc_string
+    }
+
+    return pfc_full_stack
+
+
+def calculate_daily_water_allowance(weight: float) -> int:
+    daily_water_allowance = round(weight * 30)
+
+    return daily_water_allowance
