@@ -32,46 +32,6 @@ async def cmd_main(message: types.Message) -> None:
                                parse_mode=ParseMode.HTML,
                                reply_markup=ADD_OR_DELETE_PRODUCT_IKB)
     else:
-        # # Питание пользователя за сегодня
-        # feeding_today = UserFeedingDB.get_feeding_today(user_id=message.from_user.id)
-        #
-        # product_lines = []
-        #
-        # for data in feeding_today:
-        #     product_id = data.get('product_id')
-        #     feeding_time = data.get('feeding_time')
-        #     product_weight = data.get('product_weight')
-        #
-        #     # Находим продукт в БД
-        #     product = ProductsDB.get_product(product_id)
-        #
-        #     title = product.get('title')
-        #     proteins = product.get('proteins')
-        #     fats = product.get('fats')
-        #     carbohydrates = product.get('carbohydrates')
-        #     calories = product.get('calories')
-        #
-        #     eaten_product = total_product_value(product_id, title, proteins, fats, carbohydrates, calories, product_weight)
-        #
-        #     product_lines.append(f'{feeding_time}:  <b>{eaten_product.get("title")}, {eaten_product.get("weight")}g<\b>'
-        #                          f'Белки: {eaten_product.get("proteins")}\n'
-        #                          f'Жиры: {eaten_product.get("fats")}\n'
-        #                          f'Углеводы: {eaten_product.get("carbohydrates")}\n'
-        #                          f'Калории: {eaten_product.get("calories")}')
-        #
-        # product_text = "\n".join(product_lines)
-        #
-        # await bot.send_message(chat_id=message.from_user.id,
-        #                        text=f'Ваш текущий вес: <b>{UserProfilesDB.get_one_user_param(user_id=message.from_user.id, column="weight")} kg</b>\n\n'
-        #                             f'Дата: <b>{date.today()}</b>\n\n\n'
-        #                             f'{product_text or "Сегодня вы не добавили ни одного продукта."}\n\n'
-        #                             f'<u><i>ИТОГО</i></u>:    (<i>Б/Ж/У</i>)    <b>0/</b>{user_daily_pfc.get("p")} <b>0</b>/{user_daily_pfc.get("f")} <b>0</b>/{user_daily_pfc.get("c")}\n'
-        #                             f'                  (<i>Ккал</i>)      <b>0</b>/1555\n'
-        #                             f'                  (<i>Вода</i>)      <b>1455 ml</b>',
-        #                        parse_mode=ParseMode.HTML,
-        #                        reply_markup=ADD_OR_DELETE_PRODUCT_IKB)
-
-
         # Питание пользователя за сегодня
         feeding_today = UserFeedingDB.get_feeding_today(user_id=message.from_user.id)
 
