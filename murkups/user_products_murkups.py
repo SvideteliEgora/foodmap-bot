@@ -1,15 +1,12 @@
-from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMarkup, KeyboardButton
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 
-def add_product_ikb() -> InlineKeyboardMarkup:
-    ikb = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton('+', callback_data='add_product')]
-    ])
-
-    return ikb
+IKB_ADD_USER_PRODUCTS = InlineKeyboardMarkup(inline_keyboard=[
+    [InlineKeyboardButton('Добавить продукт', callback_data='main_product_add')],
+])
 
 
-def get_results_search_products_kb(products: dict, current_page=1) -> InlineKeyboardMarkup:
+def ikb_get_user_products(products: dict, current_page=1) -> InlineKeyboardMarkup:
 
     # Создаем клавиатуру
     ikb = InlineKeyboardMarkup()
@@ -26,7 +23,7 @@ def get_results_search_products_kb(products: dict, current_page=1) -> InlineKeyb
     # Если кнопок больше, чем на одной странице, добавляем кнопки "Далее" и "Счетчик страниц"
     if len(products) > buttons_on_page:
         ikb.add(InlineKeyboardButton(f"{current_page} / {pages_count}", callback_data='pages_count'))
-        ikb.insert(InlineKeyboardButton(f">>", callback_data=f"next_{current_page + 1}"))
+        ikb.insert(InlineKeyboardButton(f">>", callback_data=f"user_products_next_{current_page + 1}"))
 
     if current_page > 1:
         ikb.inline_keyboard = []
@@ -34,12 +31,10 @@ def get_results_search_products_kb(products: dict, current_page=1) -> InlineKeyb
             ikb.add(InlineKeyboardButton(product.get("title"), callback_data=product.get("id")))
 
         # Добавляем кнопки "<<", "счетчик страниц", ">>"
-        ikb.add(InlineKeyboardButton("<<", callback_data=f"{current_page - 1}_back"))
+        ikb.add(InlineKeyboardButton("<<", callback_data=f"user_products_back_{current_page - 1}"))
         ikb.insert(InlineKeyboardButton(f"{current_page} / {pages_count}", callback_data='pages_count'))
 
         if current_page < pages_count:
-            ikb.insert(InlineKeyboardButton(f">>", callback_data=f"next_{current_page + 1}"))
+            ikb.insert(InlineKeyboardButton(f">>", callback_data=f"user_products_next_{current_page + 1}"))
 
     return ikb
-
-

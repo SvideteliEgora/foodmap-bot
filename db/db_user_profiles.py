@@ -1,4 +1,4 @@
-from .database import DB
+from .db import DB
 
 
 class UserProfilesDB(DB):

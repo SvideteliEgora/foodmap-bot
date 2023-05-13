@@ -6,7 +6,7 @@ from loader import UserProfilesDB
 from murkups.search_product_murkups import get_results_search_products_kb, add_product_ikb
 from murkups.profile_markups import CREATE_PROFILE
 from functions.get_total_calories import total_product_value
-from states.product_state import ProductsStatesGroup
+from states.product_states import ProductsStatesGroup
 
 
 @dp.message_handler(state=ProductsStatesGroup.search_product)
@@ -29,38 +29,36 @@ async def search_products(message: types.Message, state: FSMContext):
     await ProductsStatesGroup.choose_product.set()
     async with state.proxy() as data:
         data['current_page'] = 1
-        data['pages_count'] = (len(products) - 1) // 50 + 1
+        data['pages_count'] = (len(products) - 1) // 10 + 1
         data['search_products'] = products
 
     # Отправляем сообщение с клавиатурой
     await message.answer("Выбери подходящий вариант:", reply_markup=get_results_search_products_kb(products))
 
 
-@dp.message_handler(Text(startswith='Далее --> '), state=ProductsStatesGroup.choose_product)
-async def next_page(message: types.Message, state: FSMContext):
+@dp.callback_query_handler(Text(startswith='next_'), state=ProductsStatesGroup.choose_product)
+async def next_page(callback: types.CallbackQuery, state: FSMContext):
     async with state.proxy() as data:
         data['current_page'] += 1
-    await message.answer(text="Выбери подходящий вариант:",
-                         reply_markup=get_results_search_products_kb(data['search_products'],
-                                                                     current_page=data['current_page']))
+    await callback.message.edit_text(text="Выбери подходящий вариант:",
+                                     reply_markup=get_results_search_products_kb(data['search_products'], data['current_page']))
 
 
-@dp.message_handler(Text(endswith=' <-- Назад'), state=ProductsStatesGroup.choose_product)
-async def back_page(message: types.Message, state: FSMContext):
+@dp.callback_query_handler(Text(endswith='_back'), state=ProductsStatesGroup.choose_product)
+async def back_page(callback: types.CallbackQuery, state: FSMContext):
     async with state.proxy() as data:
         data['current_page'] -= 1
-    await message.answer(text="Выберете подходящий вариант:",
-                         reply_markup=get_results_search_products_kb(data['search_products'],
-                                                                     current_page=data['current_page']))
+    await callback.message.edit_text(text="Выберете подходящий вариант:",
+                                     reply_markup=get_results_search_products_kb(data['search_products'], data['current_page']))
 
 
-@dp.message_handler(state=ProductsStatesGroup.choose_product)
-async def choose_product(message: types.Message, state: FSMContext):
+@dp.callback_query_handler(state=ProductsStatesGroup.choose_product)
+async def choose_product(callback: types.CallbackQuery, state: FSMContext):
     async with state.proxy() as data:
         for item in data['search_products']:
-            if item['title'].lower() == message.text.lower():
+            if item.get('id') == int(callback.data):
                 data['select_product'] = item
-                await message.answer(text=f"{item['title']}\n"
+                await callback.message.answer(text=f"{item['title']}\n"
                                           f"На 100 грамм:\n"
                                           f"Калорийность - {item['calories']}\n"
                                           f"Белки - {item['proteins']}\n"
@@ -70,11 +68,11 @@ async def choose_product(message: types.Message, state: FSMContext):
                 return
         else:
             # Находим все продукты, которые содержат искомую строку
-            products = ProductsDB.find_products(message.text)
+            products = ProductsDB.find_products(callback.message.text)
 
             # Если список продуктов пуст, отправляем сообщение, что ничего не найдено
             if not products:
-                await message.answer("Ничего не найдено")
+                await callback.message.answer("Ничего не найдено")
                 return
 
             await ProductsStatesGroup.choose_product.set()
@@ -84,4 +82,4 @@ async def choose_product(message: types.Message, state: FSMContext):
                 data['search_products'] = products
 
             # Отправляем сообщение с клавиатурой
-            await message.answer("Выбери подходящий вариант:", reply_markup=get_results_search_products_kb(products))
+            await callback.message.answer("Выбери подходящий вариант:", reply_markup=get_results_search_products_kb(products))

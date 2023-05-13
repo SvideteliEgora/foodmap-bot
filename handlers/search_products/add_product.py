@@ -1,7 +1,7 @@
 from loader import dp, UserFeedingDB
 from aiogram import types
 from aiogram.dispatcher.filters import Text
-from states.product_state import ProductsStatesGroup
+from states.product_states import ProductsStatesGroup
 from aiogram.dispatcher import FSMContext
 from functions.get_total_calories import total_product_value
 from aiogram.types import ParseMode, ReplyKeyboardRemove

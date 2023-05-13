@@ -2,7 +2,7 @@ from loader import bot, dp
 from aiogram import types
 from loader import UserProfilesDB
 from murkups.profile_markups import CREATE_PROFILE
-from states.product_state import ProductsStatesGroup
+from states.product_states import ProductsStatesGroup
 
 
 @dp.message_handler(commands=['searchproduct'])

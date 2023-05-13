@@ -1,7 +1,13 @@
-from .database import DB
+from .db import DB
 
 
 class UserProductsDB(DB):
+
+    def user_products_exists(self, user_id):
+        """Проверяем есть ли у пользователя добавленные продукты"""
+        result = self.cursor.execute("SELECT * FROM user_products WHERE user_id=?", (user_id,))
+        print(result.fetchall())
+        return bool(len(result.fetchall()))
 
     def add_product(self, user_id, product):
         """Добoвляем продукт"""
@@ -22,10 +28,10 @@ class UserProductsDB(DB):
         """Получаем все продукты пользователя"""
         search_result = self.cursor.execute("SELECT * FROM user_products WHERE id = ?", (user_id,))
         result = search_result.fetchall()
-        all_products_by_user = []
+        all_user_products = []
         if result:
             for item in result:
-                all_products_by_user.append({
+                all_user_products.append({
                     'id': item[0],
                     'title': item[1],
                     'proteins': item[2],
@@ -35,7 +41,7 @@ class UserProductsDB(DB):
                     'user_id': item[6]
                 })
 
-        return all_products_by_user
+        return all_user_products
 
     def delete_all_products(self, user_id):
         """Удаляем все продукты пользователя"""
